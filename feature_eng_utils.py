@@ -1,8 +1,6 @@
-import importlib
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from sklearn.decomposition import PCA
 
 def normalTransform(df, x):
     df[x] = 1/np.sqrt(2*np.pi*df[x].std()) * np.exp(- np.power((df[x] - df[x].mean()) /(df[x].std()), 2) / 2)
@@ -38,3 +36,34 @@ def LagMACorrelations(df, targets):
             rows.append((tgt, col, corr))
     
     return pd.DataFrame(rows, columns=['target','feature','correlation'])
+
+def plot_lag_scatter(df, targets, lags):
+    """
+    Creates scatter plots of each target vs each of its lag features.
+    Layout: one row per target, one column per lag.
+    """
+
+    n_targets = len(targets)
+    n_lags = len(lags)
+
+    fig, axes = plt.subplots(n_targets, n_lags, figsize=(5*n_lags, 4*n_targets), squeeze=False)
+
+    for i, tgt in enumerate(targets):
+        for j, lag in enumerate(lags):
+            ax = axes[i][j]
+
+            lag_col = f"{tgt}_lag{lag}"
+            if lag_col not in df.columns:
+                ax.set_title(f"{lag_col} missing")
+                ax.axis("off")
+                continue
+
+            # Scatter plot
+            ax.scatter(df[lag_col], df[tgt], alpha=0.4, s=10)
+            ax.set_xlabel(lag_col)
+            ax.set_ylabel(tgt)
+            ax.set_title(f"{tgt} vs {lag_col}")
+
+    plt.tight_layout()
+    plt.show()
+    return 
