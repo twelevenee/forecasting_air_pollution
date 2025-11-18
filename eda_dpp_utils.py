@@ -8,6 +8,7 @@ from scipy import stats
 from ucimlrepo import fetch_ucirepo
 from tabulate import tabulate
 
+targets = ['CO(GT)', 'NMHC(GT)', 'C6H6(GT)', 'NOx(GT)', 'NO2(GT)']
 
 def preProcessing(): 
     air_quality = fetch_ucirepo(id=360) 
@@ -82,9 +83,8 @@ def plot_moving_avg(df, feature, targets, window):
 
 
 
-def scatter_targetNontarget(df, targets):
+def scatter_targetNontarget(df):
     non_target_cols = [c for c in df.columns if '(GT)' not in c and c not in ['hour','weekday','month']]
-
     for target in targets:
         g = sns.PairGrid(df[non_target_cols + [target]], y_vars=[target], x_vars=non_target_cols, height=2.5)
         g.map(sns.scatterplot, s=15)
